@@ -102,7 +102,7 @@ export default function TutorialCard({ tutorial, liked = false, onLikeChange }: 
         </p>
 
         <p className="mt-2 text-xs font-medium text-text-secondary dark:text-text-secondary-dark">
-          {tutorial.authorName || tutorial.creatorId.slice(0, 8)}
+          {tutorial.authorName || (tutorial.creatorId?.slice(0, 8) ?? 'User')}
         </p>
 
         <div className="mt-3 flex items-center gap-4 text-sm">

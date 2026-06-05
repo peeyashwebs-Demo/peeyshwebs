@@ -150,14 +150,14 @@ function CommentItem({
             <img src={comment.userAvatar} alt="" className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs font-bold text-accent">
-              {comment.userName?.charAt(0).toUpperCase() || comment.userId.charAt(0).toUpperCase()}
+              {comment.userName?.charAt(0).toUpperCase() || (comment.userId?.charAt(0).toUpperCase() ?? '?')}
             </div>
           )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-medium text-text-primary dark:text-text-primary-dark truncate">
-              {comment.userName || comment.userId.slice(0, 8)}
+              {comment.userName || (comment.userId?.slice(0, 8) ?? 'User')}
             </p>
             {isOwner && (
               <button
@@ -188,13 +188,13 @@ function CommentItem({
                   <img src={reply.userAvatar} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-[10px] font-bold text-accent">
-                    {reply.userName?.charAt(0).toUpperCase() || reply.userId.charAt(0).toUpperCase()}
+                    {reply.userName?.charAt(0).toUpperCase() || (reply.userId?.charAt(0).toUpperCase() ?? '?')}
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
-                  {reply.userName || reply.userId.slice(0, 8)}
+                  {reply.userName || (reply.userId?.slice(0, 8) ?? 'User')}
                 </p>
                 <p className="mt-0.5 text-sm text-text-primary dark:text-text-primary-dark">
                   {reply.text}

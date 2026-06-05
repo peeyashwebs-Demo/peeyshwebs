@@ -52,8 +52,8 @@ export default function TutorialView() {
           const isLiked = await getLikeDoc(user.uid, t.tutorialId);
           setLiked(isLiked);
         }
-        const profile = await getUserProfile(t.creatorId);
-        setCreatorName(profile?.displayName || t.creatorId.slice(0, 8));
+        const profile = t.creatorId ? await getUserProfile(t.creatorId) : null;
+        setCreatorName(profile?.displayName || (t.creatorId?.slice(0, 8) ?? 'User'));
       }
     })();
   }, [id, user]);

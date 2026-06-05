@@ -79,10 +79,10 @@ export default function VideoPage() {
             }
           }
           try {
-            const profile = await getUserProfile(t.creatorId);
-            setCreatorName(profile?.displayName || t.authorName || t.creatorId.slice(0, 8));
+            const profile = t.creatorId ? await getUserProfile(t.creatorId) : null;
+            setCreatorName(profile?.displayName || t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
           } catch {
-            setCreatorName(t.authorName || t.creatorId.slice(0, 8));
+            setCreatorName(t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
           }
         }
       } catch {
@@ -90,7 +90,7 @@ export default function VideoPage() {
         if (fallback) {
           setTutorial(fallback);
           setLikeCount(fallback.likesCount || 0);
-          setCreatorName(fallback.authorName || fallback.creatorId.slice(0, 8));
+          setCreatorName(fallback.authorName || (fallback.creatorId?.slice(0, 8) ?? 'User'));
         }
       } finally {
         setLoading(false);
@@ -369,14 +369,14 @@ export default function VideoPage() {
                       <img src={comment.userAvatar} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs font-bold text-accent">
-                        {comment.userName?.charAt(0).toUpperCase() || comment.userId.charAt(0).toUpperCase()}
+                        {comment.userName?.charAt(0).toUpperCase() || (comment.userId?.charAt(0).toUpperCase() ?? '?')}
                       </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium text-text-primary dark:text-text-primary-dark truncate">
-                        {comment.userName || comment.userId.slice(0, 8)}
+                        {comment.userName || (comment.userId?.slice(0, 8) ?? 'User')}
                       </p>
                       {user?.uid === comment.userId && (
                         <button
