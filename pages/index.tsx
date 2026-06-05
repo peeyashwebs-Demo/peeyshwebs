@@ -73,10 +73,10 @@ export default function Home() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-text-primary dark:text-text-primary-dark">
-            Discover
+            L - Hub
           </h1>
           <p className="mt-1 text-text-secondary dark:text-text-secondary-dark">
-            Explore tutorials created by the community
+            Discover & share tutorials
           </p>
         </div>
 
