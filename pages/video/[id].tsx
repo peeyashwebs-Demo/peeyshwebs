@@ -212,7 +212,7 @@ export default function VideoPage() {
     );
   }
 
-  const youtubeId = getYouTubeId(tutorial.mediaUrl);
+  const youtubeId = tutorial.mediaUrl ? getYouTubeId(tutorial.mediaUrl) : null;
   const isOwner = user?.uid === tutorial.creatorId;
 
   return (
