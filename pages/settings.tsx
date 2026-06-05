@@ -150,6 +150,11 @@ export default function Settings() {
                     <span className="text-xs text-text-secondary dark:text-text-secondary-dark">Preview</span>
                   </div>
                 )}
+                {avatarUrl && avatarUrl.startsWith('https://') && (
+                  <p className="mt-1 break-all text-xs text-text-secondary dark:text-text-secondary-dark">
+                    URL: {avatarUrl}
+                  </p>
+                )}
                 {uploadError && (
                   <p className="mt-2 text-sm text-red-500 dark:text-red-400">{uploadError}</p>
                 )}
