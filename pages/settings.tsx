@@ -8,7 +8,7 @@ import { useToast } from '@/lib/context/ToastContext';
 import { Sun, Moon, Save, User as UserIcon, Mail, Upload } from 'lucide-react';
 
 export default function Settings() {
-  const { userProfile, refreshProfile } = useAuth();
+  const { user, userProfile, refreshProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -25,9 +25,10 @@ export default function Settings() {
   }, [userProfile]);
 
   const handleSave = async () => {
-    if (!userProfile) return;
+    const uid = user?.uid || userProfile?.uid;
+    if (!uid) return;
     try {
-      await updateUserProfile(userProfile.uid, { displayName, avatarUrl });
+      await updateUserProfile(uid, { displayName, avatarUrl });
       await refreshProfile();
       setSaved(true);
       toast('Settings saved!', 'success');
@@ -39,10 +40,11 @@ export default function Settings() {
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !userProfile) return;
+    const uid = user?.uid || userProfile?.uid;
+    if (!file || !uid) return;
     setUploading(true);
     try {
-      const url = await uploadAvatar(userProfile.uid, file);
+      const url = await uploadAvatar(uid, file);
       setAvatarUrl(url);
       toast('Avatar uploaded! Save to confirm.', 'success');
     } catch {

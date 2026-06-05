@@ -145,7 +145,7 @@ function CreateTutorialModal({ onClose }: { onClose: () => void }) {
 }
 
 function SettingsModal({ onClose }: { onClose: () => void }) {
-  const { userProfile, refreshProfile } = useAuth();
+  const { user, userProfile, refreshProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -162,10 +162,11 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
   }, [userProfile]);
 
   const handleSave = async () => {
-    if (!userProfile) return;
+    const uid = user?.uid || userProfile?.uid;
+    if (!uid) return;
     setSaving(true);
     try {
-      await updateUserProfile(userProfile.uid, { displayName, avatarUrl });
+      await updateUserProfile(uid, { displayName, avatarUrl });
       await refreshProfile();
       toast('Settings saved!', 'success');
     } catch {
@@ -177,10 +178,11 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
 
   const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !userProfile) return;
+    const uid = user?.uid || userProfile?.uid;
+    if (!file || !uid) return;
     setUploading(true);
     try {
-      const url = await uploadAvatar(userProfile.uid, file);
+      const url = await uploadAvatar(uid, file);
       setAvatarUrl(url);
       toast('Avatar uploaded! Save to confirm.', 'success');
     } catch {
