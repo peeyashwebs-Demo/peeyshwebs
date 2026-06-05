@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useTheme } from '@/lib/context/ThemeContext';
 import { useToast } from '@/lib/context/ToastContext';
-import { updateUserProfile } from '@/lib/services/userService';
+import { updateUserProfile, uploadAvatar } from '@/lib/services/userService';
 import { createTutorial } from '@/lib/services/tutorialService';
 import {
   Sun,
@@ -18,6 +18,7 @@ import {
   Mail,
   Film,
   Menu,
+  Upload,
 } from 'lucide-react';
 
 function CreateTutorialModal({ onClose }: { onClose: () => void }) {
@@ -144,23 +145,48 @@ function CreateTutorialModal({ onClose }: { onClose: () => void }) {
 }
 
 function SettingsModal({ onClose }: { onClose: () => void }) {
-  const { userProfile } = useAuth();
+  const { userProfile, refreshProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
+  const fileRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState(userProfile?.displayName || '');
   const [avatarUrl, setAvatarUrl] = useState(userProfile?.avatarUrl || '');
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (userProfile) {
+      setDisplayName(userProfile.displayName || '');
+      setAvatarUrl(userProfile.avatarUrl || '');
+    }
+  }, [userProfile]);
 
   const handleSave = async () => {
     if (!userProfile) return;
     setSaving(true);
     try {
       await updateUserProfile(userProfile.uid, { displayName, avatarUrl });
+      await refreshProfile();
       toast('Settings saved!', 'success');
     } catch {
       toast('Failed to save settings', 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userProfile) return;
+    setUploading(true);
+    try {
+      const url = await uploadAvatar(userProfile.uid, file);
+      setAvatarUrl(url);
+      toast('Avatar uploaded! Save to confirm.', 'success');
+    } catch {
+      toast('Failed to upload avatar', 'error');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -203,15 +229,32 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-text-primary dark:text-text-primary-dark">
-              Avatar URL
+              Avatar
             </label>
-            <input
-              type="url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://example.com/avatar.jpg"
-              className="w-full rounded-xl border border-border dark:border-border-dark bg-background dark:bg-background-dark px-4 py-2.5 text-sm outline-none focus:border-accent"
-            />
+            <div className="flex gap-3">
+              <input
+                type="url"
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="https://example.com/avatar.jpg"
+                className="flex-1 rounded-xl border border-border dark:border-border-dark bg-background dark:bg-background-dark px-4 py-2.5 text-sm outline-none focus:border-accent"
+              />
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-hover disabled:opacity-50"
+              >
+                <Upload size={18} />
+                {uploading ? '...' : 'Upload'}
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+            </div>
             {avatarUrl && (
               <div className="mt-2 flex items-center gap-3">
                 <div className="h-10 w-10 overflow-hidden rounded-full bg-card dark:bg-card-dark">
