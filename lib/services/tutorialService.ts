@@ -37,9 +37,30 @@ export async function createTutorial(
   return docRef.id;
 }
 
+function normalizeTutorial(doc: { id: string; data: () => Record<string, unknown> }): Tutorial {
+  const raw = doc.data() as Record<string, unknown>;
+  return {
+    tutorialId: doc.id,
+    creatorId: (raw.creatorId as string) || '',
+    authorName: raw.authorName as string | undefined,
+    title: (raw.title as string) || 'Untitled',
+    description: (raw.description as string) || '',
+    mediaType: (raw.mediaType as 'video' | 'image') || 'video',
+    mediaUrl: (raw.mediaUrl as string) || '',
+    thumbnailUrl: (raw.thumbnailUrl as string) || '',
+    category: (raw.category as string) || 'General',
+    tags: (raw.tags as string[]) || [],
+    creationDate: (raw.creationDate as number) || Date.now(),
+    updateDate: (raw.updateDate as number) || Date.now(),
+    likesCount: (raw.likesCount as number) || 0,
+    commentsCount: (raw.commentsCount as number) || 0,
+    shareCount: (raw.shareCount as number) || 0,
+  };
+}
+
 export async function getTutorial(id: string): Promise<Tutorial | null> {
   const snap = await getDoc(doc(db, TUTORIALS, id));
-  return snap.exists() ? ({ tutorialId: snap.id, ...snap.data() } as Tutorial) : null;
+  return snap.exists() ? normalizeTutorial(snap) : null;
 }
 
 export async function getTutorials(opts?: {
@@ -67,12 +88,12 @@ export async function getTutorials(opts?: {
 
   const q = query(collection(db, TUTORIALS), ...constraints);
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ tutorialId: d.id, ...d.data() } as Tutorial));
+  return snap.docs.map(normalizeTutorial);
 }
 
 export async function getAllTutorials(): Promise<Tutorial[]> {
   const snap = await getDocs(collection(db, TUTORIALS));
-  return snap.docs.map((d) => ({ tutorialId: d.id, ...d.data() } as Tutorial));
+  return snap.docs.map(normalizeTutorial);
 }
 
 export async function updateTutorial(id: string, data: Partial<Tutorial>) {

@@ -142,10 +142,10 @@ export default function TutorialView() {
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-text-secondary dark:text-text-secondary-dark">
               <span className="flex items-center gap-1">
                 <Calendar size={15} />
-                {new Date(tutorial.creationDate).toLocaleDateString()}
+                {new Date(tutorial.creationDate || Date.now()).toLocaleDateString()}
               </span>
               <span className="rounded-md bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-                {tutorial.category}
+                {tutorial.category || 'General'}
               </span>
               <span className="flex items-center gap-1 text-xs">
                 <User size={15} />

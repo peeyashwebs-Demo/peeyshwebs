@@ -174,7 +174,7 @@ function CommentItem({
             {comment.text}
           </p>
           <p className="mt-1 text-xs text-text-secondary dark:text-text-secondary-dark">
-            {new Date(comment.timestamp).toLocaleDateString()}
+            {new Date(comment.timestamp || Date.now()).toLocaleDateString()}
           </p>
         </div>
       </div>

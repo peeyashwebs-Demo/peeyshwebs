@@ -251,7 +251,7 @@ export default function VideoPage() {
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-text-secondary dark:text-text-secondary-dark">
           <span className="flex items-center gap-1">
             <Calendar size={15} />
-            {new Date(tutorial.creationDate).toLocaleDateString()}
+            {new Date(tutorial.creationDate || Date.now()).toLocaleDateString()}
           </span>
           <span className="flex items-center gap-1">
             <User size={15} />
@@ -391,7 +391,7 @@ export default function VideoPage() {
                       {comment.text}
                     </p>
                     <p className="mt-1 text-xs text-text-secondary dark:text-text-secondary-dark">
-                      {new Date(comment.timestamp).toLocaleDateString()}
+                      {new Date(comment.timestamp || Date.now()).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
