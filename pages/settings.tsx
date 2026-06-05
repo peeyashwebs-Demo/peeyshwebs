@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -16,6 +16,13 @@ export default function Settings() {
   const [avatarUrl, setAvatarUrl] = useState(userProfile?.avatarUrl || '');
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (userProfile) {
+      setDisplayName(userProfile.displayName || '');
+      setAvatarUrl(userProfile.avatarUrl || '');
+    }
+  }, [userProfile]);
 
   const handleSave = async () => {
     if (!userProfile) return;
