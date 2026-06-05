@@ -46,11 +46,14 @@ export default function Settings() {
     try {
       const url = await uploadAvatar(uid, file);
       setAvatarUrl(url);
-      toast('Avatar uploaded! Save to confirm.', 'success');
+      await updateUserProfile(uid, { avatarUrl: url });
+      await refreshProfile();
+      toast('Avatar saved!', 'success');
     } catch {
       toast('Failed to upload avatar', 'error');
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 
