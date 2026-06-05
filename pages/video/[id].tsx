@@ -15,7 +15,7 @@ import {
   deleteComment,
   subscribeComments,
 } from '@/lib/services/commentService';
-import { getUserProfile } from '@/lib/services/userService';
+import { getUserProfile, toggleLikeTutorial } from '@/lib/services/userService';
 import type { Tutorial, Comment } from '@/lib/types';
 import { FALLBACK_TUTORIALS } from '@/lib/hooks/useTutorials';
 import {
@@ -63,29 +63,19 @@ export default function VideoPage() {
     setLoading(true);
     (async () => {
       try {
-        const fallback = FALLBACK_TUTORIALS.find((ft) => ft.tutorialId === id);
-        if (fallback) {
-          setTutorial(fallback);
-          setLikeCount(fallback.likesCount || 0);
-          setCreatorName(fallback.authorName || (fallback.creatorId?.slice(0, 8) ?? 'User'));
-        } else {
-          let t = await getTutorial(id);
-          setTutorial(t);
-          if (t) {
-            setLikeCount(t.likesCount || 0);
-            if (user) {
-              try {
-                const isLiked = await getLikeDoc(user.uid, t.tutorialId);
-                setLiked(isLiked);
-              } catch {
-                // couldn't check like state, default to false
-              }
-            }
+        let t: Tutorial | null = FALLBACK_TUTORIALS.find((ft) => ft.tutorialId === id) || null;
+        if (!t) t = await getTutorial(id);
+        setTutorial(t);
+        if (t) {
+          setLikeCount(t.likesCount || 0);
+          const profile = t.creatorId ? await getUserProfile(t.creatorId).catch(() => null) : null;
+          setCreatorName(profile?.displayName || t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
+          if (user) {
             try {
-              const profile = t.creatorId ? await getUserProfile(t.creatorId) : null;
-              setCreatorName(profile?.displayName || t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
+              const isLiked = await getLikeDoc(user.uid, t.tutorialId);
+              setLiked(isLiked);
             } catch {
-              setCreatorName(t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
+              // couldn't check like state, default to false
             }
           }
         }
@@ -127,6 +117,7 @@ export default function VideoPage() {
     setLiked(newLiked);
     setLikeCount((c) => c + (newLiked ? 1 : -1));
     toggleLikeDoc(user.uid, tutorial.tutorialId, liked).catch(() => {});
+    toggleLikeTutorial(user.uid, tutorial.tutorialId, liked).catch(() => {});
   };
 
   const handleShare = async () => {

@@ -10,7 +10,8 @@ service cloud.firestore {
     match /tutorials/{tutorialId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.creatorId;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.creatorId;
     }
 
     match /comments/{commentId} {
