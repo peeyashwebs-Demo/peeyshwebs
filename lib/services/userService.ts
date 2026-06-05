@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
 import type { User } from '@/lib/types';
 
 export async function getUserProfile(uid: string): Promise<User | null> {
@@ -8,7 +9,13 @@ export async function getUserProfile(uid: string): Promise<User | null> {
 }
 
 export async function updateUserProfile(uid: string, data: Partial<User>) {
-  await updateDoc(doc(db, 'users', uid), data);
+  await setDoc(doc(db, 'users', uid), data, { merge: true });
+}
+
+export async function uploadAvatar(uid: string, file: File): Promise<string> {
+  const storageRef = ref(storage, `avatars/${uid}/${Date.now()}_${file.name}`);
+  await uploadBytes(storageRef, file);
+  return getDownloadURL(storageRef);
 }
 
 export async function toggleLikeTutorial(uid: string, tutorialId: string, isLiked: boolean) {

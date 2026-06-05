@@ -1,23 +1,48 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Head from 'next/head';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useTheme } from '@/lib/context/ThemeContext';
-import { updateUserProfile } from '@/lib/services/userService';
-import { Sun, Moon, Save, User as UserIcon, Mail } from 'lucide-react';
+import { updateUserProfile, uploadAvatar } from '@/lib/services/userService';
+import { useToast } from '@/lib/context/ToastContext';
+import { Sun, Moon, Save, User as UserIcon, Mail, Upload } from 'lucide-react';
 
 export default function Settings() {
-  const { userProfile } = useAuth();
+  const { userProfile, refreshProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { toast } = useToast();
+  const fileRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState(userProfile?.displayName || '');
   const [avatarUrl, setAvatarUrl] = useState(userProfile?.avatarUrl || '');
   const [saved, setSaved] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const handleSave = async () => {
     if (!userProfile) return;
-    await updateUserProfile(userProfile.uid, { displayName, avatarUrl });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await updateUserProfile(userProfile.uid, { displayName, avatarUrl });
+      await refreshProfile();
+      setSaved(true);
+      toast('Settings saved!', 'success');
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      toast('Failed to save settings', 'error');
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userProfile) return;
+    setUploading(true);
+    try {
+      const url = await uploadAvatar(userProfile.uid, file);
+      setAvatarUrl(url);
+      toast('Avatar uploaded! Save to confirm.', 'success');
+    } catch {
+      toast('Failed to upload avatar', 'error');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -66,15 +91,32 @@ export default function Settings() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-text-primary dark:text-text-primary-dark">
-                  Avatar URL
+                  Avatar
                 </label>
-                <input
-                  type="url"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  placeholder="https://example.com/avatar.jpg"
-                  className="w-full rounded-xl border border-border dark:border-border-dark bg-background dark:bg-background-dark px-4 py-3 text-sm text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark outline-none focus:border-accent transition"
-                />
+                <div className="flex gap-3">
+                  <input
+                    type="url"
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    placeholder="https://example.com/avatar.jpg"
+                    className="flex-1 rounded-xl border border-border dark:border-border-dark bg-background dark:bg-background-dark px-4 py-3 text-sm text-text-primary dark:text-text-primary-dark placeholder:text-text-secondary dark:placeholder:text-text-secondary-dark outline-none focus:border-accent transition"
+                  />
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploading}
+                    className="flex items-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-hover disabled:opacity-50"
+                  >
+                    <Upload size={18} />
+                    {uploading ? '...' : 'Upload'}
+                  </button>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarUpload}
+                  />
+                </div>
                 {avatarUrl && (
                   <div className="mt-2 flex items-center gap-3">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-card dark:bg-card-dark">
