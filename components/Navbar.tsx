@@ -153,11 +153,13 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
   const [avatarUrl, setAvatarUrl] = useState(userProfile?.avatarUrl || '');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
 
   useEffect(() => {
     if (userProfile) {
       setDisplayName(userProfile.displayName || '');
       setAvatarUrl(userProfile.avatarUrl || '');
+      setPreviewUrl(userProfile.avatarUrl || '');
     }
   }, [userProfile]);
 
@@ -179,11 +181,18 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
   const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const uid = user?.uid || userProfile?.uid;
-    if (!file || !uid) return;
+    if (!file || !uid) {
+      toast('No file selected or user not found', 'error');
+      return;
+    }
     setUploading(true);
     try {
+      const localUrl = URL.createObjectURL(file);
+      setPreviewUrl(localUrl);
       const url = await uploadAvatar(uid, file);
+      URL.revokeObjectURL(localUrl);
       setAvatarUrl(url);
+      setPreviewUrl(url);
       await updateUserProfile(uid, { avatarUrl: url });
       await refreshProfile();
       toast('Avatar saved!', 'success');
@@ -260,10 +269,10 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
                 onChange={handleAvatarUpload}
               />
             </div>
-            {avatarUrl && (
+            {previewUrl && (
               <div className="mt-2 flex items-center gap-3">
                 <div className="h-10 w-10 overflow-hidden rounded-full bg-card dark:bg-card-dark">
-                  <img src={avatarUrl} alt="" className="h-full w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                  <img src={previewUrl} alt="" className="h-full w-full object-cover" />
                 </div>
                 <span className="text-xs text-text-secondary">Preview</span>
               </div>
