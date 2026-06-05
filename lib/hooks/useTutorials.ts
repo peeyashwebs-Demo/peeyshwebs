@@ -112,7 +112,8 @@ export function useAllTutorials() {
   const fetchTutorials = useCallback(async () => {
     try {
       const data = await getAllTutorials();
-      if (data.length > 0) setTutorials([...data, ...FALLBACK_TUTORIALS]);
+      const fallbackIds = new Set(FALLBACK_TUTORIALS.map((f) => f.tutorialId));
+      setTutorials([...data.filter((d) => !fallbackIds.has(d.tutorialId)), ...FALLBACK_TUTORIALS]);
     } catch {
       // fallback already shown
     } finally {

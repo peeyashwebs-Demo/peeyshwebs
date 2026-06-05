@@ -63,26 +63,30 @@ export default function VideoPage() {
     setLoading(true);
     (async () => {
       try {
-        let t = await getTutorial(id);
-        if (!t) {
-          t = FALLBACK_TUTORIALS.find((ft) => ft.tutorialId === id) || null;
-        }
-        setTutorial(t);
-        if (t) {
-          setLikeCount(t.likesCount || 0);
-          if (user) {
-            try {
-              const isLiked = await getLikeDoc(user.uid, t.tutorialId);
-              setLiked(isLiked);
-            } catch {
-              // couldn't check like state, default to false
+        const fallback = FALLBACK_TUTORIALS.find((ft) => ft.tutorialId === id);
+        if (fallback) {
+          setTutorial(fallback);
+          setLikeCount(fallback.likesCount || 0);
+          setCreatorName(fallback.authorName || (fallback.creatorId?.slice(0, 8) ?? 'User'));
+        } else {
+          let t = await getTutorial(id);
+          setTutorial(t);
+          if (t) {
+            setLikeCount(t.likesCount || 0);
+            if (user) {
+              try {
+                const isLiked = await getLikeDoc(user.uid, t.tutorialId);
+                setLiked(isLiked);
+              } catch {
+                // couldn't check like state, default to false
+              }
             }
-          }
-          try {
-            const profile = t.creatorId ? await getUserProfile(t.creatorId) : null;
-            setCreatorName(profile?.displayName || t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
-          } catch {
-            setCreatorName(t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
+            try {
+              const profile = t.creatorId ? await getUserProfile(t.creatorId) : null;
+              setCreatorName(profile?.displayName || t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
+            } catch {
+              setCreatorName(t.authorName || (t.creatorId?.slice(0, 8) ?? 'User'));
+            }
           }
         }
       } catch {
