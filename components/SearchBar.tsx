@@ -52,7 +52,7 @@ export default function SearchBar({
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <div className="flex items-center gap-2 text-sm text-text-secondary dark:text-text-secondary-dark">
           <SlidersHorizontal size={16} />
           <span className="font-medium">Filters</span>
@@ -61,7 +61,7 @@ export default function SearchBar({
         <select
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
-          className="rounded-lg border border-border dark:border-border-dark bg-surface dark:bg-surface-dark px-3 py-1.5 text-sm text-text-primary dark:text-text-primary-dark outline-none"
+          className="rounded-lg border border-border dark:border-border-dark bg-surface dark:bg-surface-dark px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-primary dark:text-text-primary-dark outline-none"
         >
           {CATEGORIES.map((c) => (
             <option key={c} value={c === 'All' ? '' : c}>
@@ -73,7 +73,7 @@ export default function SearchBar({
         <select
           value={mediaType}
           onChange={(e) => onMediaTypeChange(e.target.value)}
-          className="rounded-lg border border-border dark:border-border-dark bg-surface dark:bg-surface-dark px-3 py-1.5 text-sm text-text-primary dark:text-text-primary-dark outline-none"
+          className="rounded-lg border border-border dark:border-border-dark bg-surface dark:bg-surface-dark px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-primary dark:text-text-primary-dark outline-none"
         >
           <option value="">All Types</option>
           <option value="video">Video</option>
@@ -83,7 +83,7 @@ export default function SearchBar({
         <select
           value={sortBy}
           onChange={(e) => onSortByChange(e.target.value)}
-          className="rounded-lg border border-border dark:border-border-dark bg-surface dark:bg-surface-dark px-3 py-1.5 text-sm text-text-primary dark:text-text-primary-dark outline-none"
+          className="rounded-lg border border-border dark:border-border-dark bg-surface dark:bg-surface-dark px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-text-primary dark:text-text-primary-dark outline-none"
         >
           <option value="new">Newest</option>
           <option value="trending">Trending</option>

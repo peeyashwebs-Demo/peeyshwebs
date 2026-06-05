@@ -86,7 +86,7 @@ export default function MediaPlayer({ mediaType, mediaUrl, title, imageUrls, aut
             {images.length > 1 && (
               <button
                 onClick={() => setCurrentIdx((i) => (i - 1 + images.length) % images.length)}
-                className="absolute -left-12 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+                className="absolute left-2 sm:-left-12 z-10 rounded-full bg-black/40 p-2 text-white transition hover:bg-black/60"
               >
                 <ChevronLeft size={24} />
               </button>
@@ -101,7 +101,7 @@ export default function MediaPlayer({ mediaType, mediaUrl, title, imageUrls, aut
             {images.length > 1 && (
               <button
                 onClick={() => setCurrentIdx((i) => (i + 1) % images.length)}
-                className="absolute -right-12 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+                className="absolute right-2 sm:-right-12 z-10 rounded-full bg-black/40 p-2 text-white transition hover:bg-black/60"
               >
                 <ChevronRight size={24} />
               </button>

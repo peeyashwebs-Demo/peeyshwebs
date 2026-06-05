@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -17,6 +17,7 @@ import {
   User as UserIcon,
   Mail,
   Film,
+  Menu,
 } from 'lucide-react';
 
 function CreateTutorialModal({ onClose }: { onClose: () => void }) {
@@ -273,6 +274,7 @@ export default function Navbar() {
   const router = useRouter();
   const [showCreate, setShowCreate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -290,45 +292,58 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {user ? (
               <>
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-all hover:bg-accent-hover hover:shadow-lg active:scale-95"
+                  className="flex items-center gap-1.5 rounded-lg bg-accent px-3 sm:px-4 py-2 text-sm font-medium text-white transition-all hover:bg-accent-hover hover:shadow-lg active:scale-95"
                 >
                   <PlusCircle size={18} />
                   Create
                 </button>
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-text-secondary dark:text-text-secondary-dark transition hover:bg-card dark:hover:bg-card-dark"
-                >
-                  <div className="h-7 w-7 overflow-hidden rounded-full bg-accent/20 ring-2 ring-accent/30">
-                    {userProfile?.avatarUrl ? (
-                      <img src={userProfile.avatarUrl} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-xs font-bold text-accent">
-                        {userProfile?.displayName?.charAt(0).toUpperCase() || '?'}
-                      </div>
-                    )}
-                  </div>
-                  <span className="hidden sm:inline">{userProfile?.displayName || 'User'}</span>
-                </Link>
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="rounded-lg p-2 text-text-secondary dark:text-text-secondary-dark transition hover:bg-card dark:hover:bg-card-dark"
-                  title="Settings"
-                >
-                  <Settings size={20} />
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="rounded-lg p-2 text-text-secondary dark:text-text-secondary-dark transition hover:bg-card dark:hover:bg-card-dark"
-                  title="Sign out"
-                >
-                  <LogOut size={20} />
-                </button>
+
+                <div className="hidden sm:flex items-center gap-1">
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-text-secondary dark:text-text-secondary-dark transition hover:bg-card dark:hover:bg-card-dark"
+                  >
+                    <div className="h-7 w-7 overflow-hidden rounded-full bg-accent/20 ring-2 ring-accent/30">
+                      {userProfile?.avatarUrl ? (
+                        <img src={userProfile.avatarUrl} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs font-bold text-accent">
+                          {userProfile?.displayName?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                      )}
+                    </div>
+                    <span className="hidden sm:inline">{userProfile?.displayName || 'User'}</span>
+                  </Link>
+                  <button
+                    onClick={() => setShowSettings(true)}
+                    className="rounded-lg p-2 text-text-secondary dark:text-text-secondary-dark transition hover:bg-card dark:hover:bg-card-dark"
+                    title="Settings"
+                  >
+                    <Settings size={20} />
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="rounded-lg p-2 text-text-secondary dark:text-text-secondary-dark transition hover:bg-card dark:hover:bg-card-dark"
+                    title="Sign out"
+                  >
+                    <LogOut size={20} />
+                  </button>
+                </div>
+
+                <div className="flex sm:hidden">
+                  <button
+                    onClick={() => setMobileOpen(!mobileOpen)}
+                    className="rounded-lg p-2 text-text-secondary dark:text-text-secondary-dark transition hover:bg-card dark:hover:bg-card-dark"
+                    aria-label="Menu"
+                  >
+                    <Menu size={22} />
+                  </button>
+                </div>
               </>
             ) : (
               <Link
@@ -347,6 +362,47 @@ export default function Navbar() {
             </button>
           </div>
         </div>
+
+        {mobileOpen && user && (
+          <div className="border-t border-border dark:border-border-dark bg-surface dark:bg-surface-dark sm:hidden">
+            <div className="space-y-1 px-4 py-3">
+              <Link
+                href="/profile"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-primary dark:text-text-primary-dark transition hover:bg-card dark:hover:bg-card-dark"
+              >
+                <div className="h-8 w-8 overflow-hidden rounded-full bg-accent/20">
+                  {userProfile?.avatarUrl ? (
+                    <img src={userProfile.avatarUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs font-bold text-accent">
+                      {userProfile?.displayName?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="font-medium">{userProfile?.displayName || 'User'}</p>
+                  <p className="text-xs text-text-secondary">{userProfile?.email}</p>
+                </div>
+              </Link>
+              <hr className="border-border dark:border-border-dark" />
+              <button
+                onClick={() => { setShowSettings(true); setMobileOpen(false); }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-primary dark:text-text-primary-dark transition hover:bg-card dark:hover:bg-card-dark"
+              >
+                <Settings size={18} className="text-text-secondary" />
+                Settings
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                <LogOut size={18} />
+                Sign Out
+              </button>
+            </div>
+          </div>
+        )}
       </nav>
 
       {showCreate && <CreateTutorialModal onClose={() => setShowCreate(false)} />}

@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background dark:bg-background-dark text-text-primary dark:text-text-primary-dark transition-colors duration-300">
       {!isAuthPage && user && <Navbar />}
       {isAuthPage && <Navbar />}
-      <main className={`mx-auto max-w-7xl px-4 ${user && !isAuthPage ? 'py-6' : 'py-0'}`}>
+      <main className={`mx-auto max-w-7xl px-3 sm:px-4 ${user && !isAuthPage ? 'py-4 sm:py-6' : 'py-0'}`}>
         {children}
       </main>
     </div>
