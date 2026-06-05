@@ -49,8 +49,8 @@ export default function Settings() {
       await updateUserProfile(uid, { avatarUrl: url });
       await refreshProfile();
       toast('Avatar saved!', 'success');
-    } catch {
-      toast('Failed to upload avatar', 'error');
+    } catch (err: any) {
+      toast(err?.message || 'Failed to upload avatar', 'error');
     } finally {
       setUploading(false);
       e.target.value = '';

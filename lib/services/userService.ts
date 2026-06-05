@@ -13,9 +13,11 @@ export async function updateUserProfile(uid: string, data: Partial<User>) {
 }
 
 export async function uploadAvatar(uid: string, file: File): Promise<string> {
-  const storageRef = ref(storage, `avatars/${uid}/${Date.now()}_${file.name}`);
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const storageRef = ref(storage, `avatars/${uid}/${Date.now()}_${safeName}`);
   await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+  const url = await getDownloadURL(storageRef);
+  return url;
 }
 
 export async function toggleLikeTutorial(uid: string, tutorialId: string, isLiked: boolean) {
