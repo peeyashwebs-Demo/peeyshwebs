@@ -154,6 +154,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     if (userProfile) {
@@ -181,6 +182,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
   const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const uid = user?.uid || userProfile?.uid;
+    setUploadError('');
     if (!file || !uid) {
       toast('No file selected or user not found', 'error');
       return;
@@ -197,7 +199,9 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       await refreshProfile();
       toast('Avatar saved!', 'success');
     } catch (err: any) {
-      toast(err?.message || 'Failed to upload avatar', 'error');
+      const msg = err?.message || 'Failed to upload avatar';
+      setUploadError(msg);
+      toast(msg, 'error');
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -276,6 +280,9 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
                 </div>
                 <span className="text-xs text-text-secondary">Preview</span>
               </div>
+            )}
+            {uploadError && (
+              <p className="mt-2 text-sm text-red-500">{uploadError}</p>
             )}
           </div>
 

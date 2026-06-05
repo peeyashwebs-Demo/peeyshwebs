@@ -17,6 +17,7 @@ export default function Settings() {
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     if (userProfile) {
@@ -43,6 +44,7 @@ export default function Settings() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const uid = user?.uid || userProfile?.uid;
+    setUploadError('');
     if (!file || !uid) {
       toast('No file selected or user not found', 'error');
       return;
@@ -59,7 +61,9 @@ export default function Settings() {
       await refreshProfile();
       toast('Avatar saved!', 'success');
     } catch (err: any) {
-      toast(err?.message || 'Failed to upload avatar', 'error');
+      const msg = err?.message || 'Failed to upload avatar';
+      setUploadError(msg);
+      toast(msg, 'error');
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -145,6 +149,9 @@ export default function Settings() {
                     </div>
                     <span className="text-xs text-text-secondary dark:text-text-secondary-dark">Preview</span>
                   </div>
+                )}
+                {uploadError && (
+                  <p className="mt-2 text-sm text-red-500 dark:text-red-400">{uploadError}</p>
                 )}
               </div>
 
