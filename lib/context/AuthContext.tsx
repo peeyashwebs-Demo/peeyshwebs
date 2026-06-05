@@ -28,6 +28,7 @@ interface AuthContextValue {
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfileLocally: (updates: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -39,6 +40,7 @@ const AuthContext = createContext<AuthContextValue>({
   signInWithGoogle: async () => {},
   logout: async () => {},
   refreshProfile: async () => {},
+  updateProfileLocally: () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -117,9 +119,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) await fetchProfile(user.uid);
   };
 
+  const updateProfileLocally = (updates: Partial<User>) => {
+    setUserProfile((prev) => prev ? { ...prev, ...updates } : prev);
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, userProfile, loading, login, register, signInWithGoogle, logout, refreshProfile }}
+      value={{ user, userProfile, loading, login, register, signInWithGoogle, logout, refreshProfile, updateProfileLocally }}
     >
       {children}
     </AuthContext.Provider>

@@ -8,7 +8,7 @@ import { useToast } from '@/lib/context/ToastContext';
 import { Sun, Moon, Save, User as UserIcon, Mail, Upload } from 'lucide-react';
 
 export default function Settings() {
-  const { user, userProfile, refreshProfile } = useAuth();
+  const { user, userProfile, refreshProfile, updateProfileLocally } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -58,7 +58,7 @@ export default function Settings() {
       setAvatarUrl(url);
       setPreviewUrl(url);
       await updateUserProfile(uid, { avatarUrl: url });
-      await refreshProfile();
+      updateProfileLocally({ avatarUrl: url });
       toast('Avatar saved!', 'success');
     } catch (err: any) {
       const msg = err?.message || 'Failed to upload avatar';
